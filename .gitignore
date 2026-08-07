@@ -1,0 +1,4 @@
+/dotclean
+*.exe
+*.test
+/dist/

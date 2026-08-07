@@ -1,0 +1,82 @@
+[
+  {
+    "file": "rich.cue.appledouble",
+    "size": 4096,
+    "attr_names": [
+      "com.apple.quarantine",
+      "com.apple.TextEncoding",
+      "com.apple.provenance",
+      "com.apple.lastuseddate#PS",
+      "com.apple.metadata:kMDLabel_eogel6ufdp55i6el6mw7tcbgji"
+    ],
+    "notes": {
+      "quarantine": "0086;5e937cbf;TextEdit;",
+      "quarantine_time_unix": 1586724031,
+      "agent": "TextEdit"
+    }
+  },
+  {
+    "file": "rich.epub.appledouble",
+    "size": 4096,
+    "attr_names": [
+      "com.apple.quarantine",
+      "com.apple.macl",
+      "com.apple.provenance",
+      "com.apple.lastuseddate#PS"
+    ],
+    "notes": {
+      "quarantine": "0281;64ea6309;;f866221a-9775-4f5a-a56a-06d81cd0c297",
+      "quarantine_time_unix": 1693082377,
+      "agent": ""
+    }
+  },
+  {
+    "file": "rich.numbers.appledouble",
+    "size": 4096,
+    "attr_names": [
+      "com.apple.quarantine",
+      "com.apple.iwork.documentUUID#PS",
+      "com.apple.lastuseddate#PS",
+      "com.apple.metadata:kMDLabel_eogel6ufdp55i6el6mw7tcbgji"
+    ],
+    "notes": {
+      "quarantine": "0086;617988fe;Numbers;",
+      "quarantine_time_unix": 1635354878,
+      "agent": "Numbers",
+      "iwork_uuid": "47504238-6a64-42e5-9429-a38102113d5a"
+    }
+  },
+  {
+    "file": "rich.pdf.appledouble",
+    "size": 4096,
+    "attr_names": [
+      "com.apple.lastuseddate#PS",
+      "com.apple.quarantine"
+    ],
+    "notes": {
+      "quarantine": "0082;5f978b33;Preview;",
+      "quarantine_time_unix": 1603767091,
+      "agent": "Preview"
+    }
+  },
+  {
+    "file": "rich.zip.appledouble",
+    "size": 4096,
+    "attr_names": [
+      "com.apple.quarantine",
+      "com.apple.macl",
+      "com.apple.metadata:kMDItemWhereFroms",
+      "com.apple.provenance",
+      "com.apple.lastuseddate#PS"
+    ],
+    "notes": {
+      "quarantine": "0281;68f08dd4;Safari;7740dfd0-7da2-4ac3-acd5-469185740d6a",
+      "quarantine_time_unix": 1760595412,
+      "agent": "Safari",
+      "wherefroms": [
+        "https://example.com/rich.zip.appledouble",
+        "https://example.com/"
+      ]
+    }
+  }
+]
