@@ -30,7 +30,7 @@ func DryRunPrint(actions []Action) {
 	}
 }
 
-func Execute(actions []Action, opts *cli.Options, mergeFn func(sidecar, native string, keep cli.KeepMode) error) error {
+func Execute(actions []Action, opts *cli.Options, mergeFn func(sidecar, native string, opts *cli.Options) error) error {
 	var failed uint64
 	var mergeFailed collections.Set[string]
 
@@ -45,7 +45,7 @@ func Execute(actions []Action, opts *cli.Options, mergeFn func(sidecar, native s
 				continue
 			}
 
-			err := mergeFn(a.Path, a.Native, opts.Keep)
+			err := mergeFn(a.Path, a.Native, opts)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "merge %s: %v\n", a.Path, err)
 				mergeFailed.Add(a.Path)

@@ -31,6 +31,7 @@ func ParseOpts(args []string) (*Options, int) {
 	fs.BoolVarP(&opts.FollowSymlinks, "follow-symlinks", "s", false, "follow symbolic links to AppleDouble files")
 	fs.BoolVarP(&opts.Verbose, "verbose", "v", false, "verbose output")
 	fs.BoolVarP(&opts.DryRun, "dry-run", "N", false, "list deletion targets only; do not merge or delete")
+	fs.BoolVarP(&opts.SetQuarantine, "set-quarantine", "Q", false, "apply com.apple.quarantine from AppleDouble when merging")
 
 	var help bool
 	fs.BoolVarP(&help, "help", "h", false, "print help and exit")

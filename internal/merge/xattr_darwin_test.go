@@ -18,7 +18,25 @@ func TestApplyDotbarWritesXattrs(t *testing.T) {
 	dir := requireMergeDir(t)
 	native, sidecar := stageGolden(t, dir, "doc.pdf", "rich.pdf.appledouble")
 
-	if err := merge.Apply(sidecar, native, cli.KeepDotbar); err != nil {
+	if err := merge.Apply(sidecar, native, &cli.Options{Keep: cli.KeepDotbar}); err != nil {
+		t.Fatal(err)
+	}
+
+	names := listXattrNames(t, native)
+	if names["com.apple.quarantine"] {
+		t.Fatal("quarantine should be skipped without SetQuarantine")
+	}
+	if !names["com.apple.lastuseddate#PS"] {
+		t.Fatalf("missing lastuseddate; have %v", names)
+	}
+}
+
+func TestApplySetQuarantineWritesQuarantine(t *testing.T) {
+	dir := requireMergeDir(t)
+	native, sidecar := stageGolden(t, dir, "doc.pdf", "rich.pdf.appledouble")
+
+	opts := &cli.Options{Keep: cli.KeepDotbar, SetQuarantine: true}
+	if err := merge.Apply(sidecar, native, opts); err != nil {
 		t.Fatal(err)
 	}
 
@@ -41,7 +59,8 @@ func TestApplyMostRecentKeepsExisting(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := merge.Apply(sidecar, native, cli.KeepMostRecent); err != nil {
+	opts := &cli.Options{Keep: cli.KeepMostRecent, SetQuarantine: true}
+	if err := merge.Apply(sidecar, native, opts); err != nil {
 		t.Fatal(err)
 	}
 

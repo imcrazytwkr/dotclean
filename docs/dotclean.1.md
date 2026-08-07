@@ -46,6 +46,9 @@ Unlike Apple’s tool, path operands are treated as opaque: whitespace inside a 
 **-N**, **--dry-run**
 : List paths that would be deleted; do not merge or delete anything.
 
+**-Q**, **--set-quarantine**
+: When merging on HFS+/APFS, apply **com.apple.quarantine** from the AppleDouble sidecar. Off by default (matches Apple **dot_clean**, which does not re-apply quarantine).
+
 **--keep**=*mode*
 : When merging on HFS+/APFS: **mostrecent** (default; prefer existing native attributes), **dotbar** (prefer AppleDouble), or **native** (skip applying AppleDouble attributes).
 

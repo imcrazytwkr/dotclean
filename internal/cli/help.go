@@ -22,6 +22,7 @@ Options:
   -s, --follow-symlinks   Follow symbolic links to AppleDouble files
   -v, --verbose           Verbose output
   -N, --dry-run           List deletion targets only; do not merge or delete
+  -Q, --set-quarantine    Apply com.apple.quarantine from AppleDouble when merging
       --keep=MODE         mostrecent (default), dotbar, or native
 
 See docs/dotclean.1.md or 'man dotclean' for the full manual.

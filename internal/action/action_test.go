@@ -25,7 +25,7 @@ func TestExecuteKeepsSidecarAfterMergeFailure(t *testing.T) {
 		{Kind: action.Merge, Path: sidecar, Native: native},
 		{Kind: action.Delete, Path: sidecar},
 	}
-	err := action.Execute(actions, &cli.Options{}, func(string, string, cli.KeepMode) error {
+	err := action.Execute(actions, &cli.Options{}, func(string, string, *cli.Options) error {
 		return errors.New("merge boom")
 	})
 	if err == nil {
@@ -51,7 +51,7 @@ func TestExecuteDeletesAfterSuccessfulMerge(t *testing.T) {
 		{Kind: action.Merge, Path: sidecar, Native: native},
 		{Kind: action.Delete, Path: sidecar},
 	}
-	if err := action.Execute(actions, &cli.Options{}, func(string, string, cli.KeepMode) error {
+	if err := action.Execute(actions, &cli.Options{}, func(string, string, *cli.Options) error {
 		return nil
 	}); err != nil {
 		t.Fatal(err)

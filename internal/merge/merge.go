@@ -11,10 +11,19 @@ import (
 const (
 	xattrFinderInfo   = "com.apple.FinderInfo"
 	xattrResourceFork = "com.apple.ResourceFork"
+	xattrQuarantine   = "com.apple.quarantine"
 )
 
-// Apply merges AppleDouble sidecar into native path according to keep mode.
-func Apply(sidecar, native string, keep cli.KeepMode) error {
+// Apply merges AppleDouble sidecar into native path according to opts.
+// A nil opts is treated as KeepMostRecent with SetQuarantine false.
+func Apply(sidecar, native string, opts *cli.Options) error {
+	keep := cli.KeepMostRecent
+	setQuarantine := false
+	if opts != nil {
+		keep = opts.Keep
+		setQuarantine = opts.SetQuarantine
+	}
+
 	if keep == cli.KeepNative {
 		return nil
 	}
@@ -41,7 +50,6 @@ func Apply(sidecar, native string, keep cli.KeepMode) error {
 		if keep == cli.KeepMostRecent && existing.Contains(name) {
 			return nil // prefer native when present
 		}
-
 		return setXattr(native, name, val)
 	}
 
@@ -59,6 +67,9 @@ func Apply(sidecar, native string, keep cli.KeepMode) error {
 
 	for _, a := range double.Attrs {
 		if len(a.Name) == 0 {
+			continue
+		}
+		if a.Name == xattrQuarantine && !setQuarantine {
 			continue
 		}
 		if err := set(a.Name, a.Value); err != nil {

@@ -57,6 +57,12 @@ Print verbose progress to standard error.
 \f[B]\-N\f[R], \f[B]\[en]dry\-run\f[R]
 List paths that would be deleted; do not merge or delete anything.
 .TP
+\f[B]\-Q\f[R], \f[B]\[en]set\-quarantine\f[R]
+When merging on HFS+/APFS, apply \f[B]com.apple.quarantine\f[R] from the
+AppleDouble sidecar.
+Off by default (matches Apple \f[B]dot_clean\f[R], which does not
+re\-apply quarantine).
+.TP
 \f[B]\[en]keep\f[R]=\f[I]mode\f[R]
 When merging on HFS+/APFS: \f[B]mostrecent\f[R] (default; prefer
 existing native attributes), \f[B]dotbar\f[R] (prefer AppleDouble), or

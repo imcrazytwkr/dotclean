@@ -39,8 +39,9 @@ func TestRunMergesAndDeletesSidecar(t *testing.T) {
 	}
 
 	opts := &cli.Options{
-		Dirs: []string{dir},
-		Keep: cli.KeepMostRecent,
+		Dirs:          []string{dir},
+		Keep:          cli.KeepMostRecent,
+		SetQuarantine: true,
 	}
 	if err := clean.Run(opts); err != nil {
 		t.Fatal(err)

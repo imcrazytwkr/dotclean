@@ -119,6 +119,30 @@ func TestParseOptsInvalidKeep(t *testing.T) {
 	}
 }
 
+func TestParseOptsSetQuarantine(t *testing.T) {
+	opts, code := cli.ParseOpts([]string{"dotclean", "-Q", "/tmp"})
+	if code != cli.ExitContinue {
+		t.Fatalf("want ExitContinue, got %d", code)
+	}
+	if !opts.SetQuarantine {
+		t.Fatal("expected SetQuarantine from -Q")
+	}
+	opts, code = cli.ParseOpts([]string{"dotclean", "--set-quarantine", "/tmp"})
+	if code != cli.ExitContinue {
+		t.Fatalf("want ExitContinue, got %d", code)
+	}
+	if !opts.SetQuarantine {
+		t.Fatal("expected SetQuarantine from --set-quarantine")
+	}
+	opts, code = cli.ParseOpts([]string{"dotclean", "/tmp"})
+	if code != cli.ExitContinue {
+		t.Fatalf("want ExitContinue, got %d", code)
+	}
+	if opts.SetQuarantine {
+		t.Fatal("SetQuarantine should default false")
+	}
+}
+
 func TestParseOptsSpacedDir(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "dir a")
 	if err := os.Mkdir(dir, 0o755); err != nil {

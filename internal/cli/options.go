@@ -9,6 +9,7 @@ type Options struct {
 	FollowSymlinks bool
 	Verbose        bool
 	DryRun         bool
+	SetQuarantine  bool // apply com.apple.quarantine from AppleDouble (off by default)
 	Keep           KeepMode
 	Dirs           []string
 	Deep           bool // future
