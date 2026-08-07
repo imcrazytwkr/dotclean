@@ -1,0 +1,2 @@
+# Allow `# shellcheck source=../lib.sh` from cases/ to resolve.
+source-path=SCRIPTDIR

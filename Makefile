@@ -1,4 +1,4 @@
-.PHONY: clean build format test test-logged man install uninstall
+.PHONY: clean build format test test-logged test-e2e test-e2e-logged man install uninstall
 
 PREFIX ?= /usr
 BIN := dotclean
@@ -20,6 +20,12 @@ test: format
 
 test-logged: format
 	go test ./... -v 2>&1 | tee test.log
+
+test-e2e:
+	./e2e/run.sh
+
+test-e2e-logged:
+	./e2e/run.sh 2>&1 | tee test-e2e.log
 
 man: docs/dotclean.1.md
 	@command -v pandoc >/dev/null || { echo "pandoc required for make man"; exit 1; }

@@ -2,4 +2,4 @@
 *.exe
 *.test
 /dist/
-test.log
+*.log
