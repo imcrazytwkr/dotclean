@@ -118,3 +118,47 @@ func TestFlatDoesNotRecurse(t *testing.T) {
 		t.Fatal("nested sidecar should remain with -f")
 	}
 }
+
+func TestAlwaysDeleteOrphan(t *testing.T) {
+	dir := t.TempDir()
+	sidecar := filepath.Join(dir, "._lonely.jpg")
+	if err := os.WriteFile(sidecar, []byte("y"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	opts := &cli.Options{Dirs: []string{dir}, AlwaysDelete: true, Keep: cli.KeepNative}
+	if err := clean.Run(opts); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(sidecar); !os.IsNotExist(err) {
+		t.Fatal("orphan should be removed with -m")
+	}
+}
+
+func TestAlwaysDeleteOverridesPreserve(t *testing.T) {
+	dir := t.TempDir()
+	native := filepath.Join(dir, "photo.jpg")
+	sidecar := filepath.Join(dir, "._photo.jpg")
+	if err := os.WriteFile(native, []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(sidecar, []byte("y"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	opts := &cli.Options{
+		Dirs:         []string{dir},
+		AlwaysDelete: true,
+		Preserve:     true,
+		Keep:         cli.KeepNative,
+	}
+	if err := clean.Run(opts); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(sidecar); !os.IsNotExist(err) {
+		t.Fatal("sidecar should be deleted when -m overrides -p")
+	}
+	if _, err := os.Stat(native); err != nil {
+		t.Fatal("native should remain")
+	}
+}
