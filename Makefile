@@ -1,14 +1,20 @@
 .PHONY: clean build format test test-logged test-e2e test-e2e-logged man install uninstall
 
 PREFIX ?= /usr
+
 BIN := dotclean
-DOC := $(BIN).1
+GO_SRC := $(shell find . -type f -name '*.go' ! -name '*_test.go')
+
+DOC := docs/$(BIN).1
+MAN_MD := $(DOC).md
 
 clean:
 	rm -f '$(BIN)'
 	go clean -testcache
 
-build:
+build: $(BIN)
+
+$(BIN): $(GO_SRC) go.mod go.sum
 	go build -o '$(BIN)' .
 
 format:
@@ -27,16 +33,18 @@ test-e2e:
 test-e2e-logged:
 	./e2e/run.sh 2>&1 | tee test-e2e.log
 
-man: docs/dotclean.1.md
-	@command -v pandoc >/dev/null || { echo "pandoc required for make man"; exit 1; }
-	pandoc docs/dotclean.1.md -s -t man -o 'docs/$(DOC)'
+man: $(DOC)
 
-install: build
+$(DOC): $(MAN_MD)
+	@command -v pandoc >/dev/null || { echo "pandoc required for make man"; exit 1; }
+	pandoc '$(MAN_MD)' -s -t man -o '$(DOC)'
+
+install: $(BIN) $(DOC)
 	mkdir -p '$(DESTDIR)$(PREFIX)/bin'
 	install -m 755 '$(BIN)' '$(DESTDIR)$(PREFIX)/bin/$(BIN)'
 
 	mkdir -p '$(DESTDIR)$(PREFIX)/share/man/man1'
-	install -m 644 'docs/$(DOC)' '$(DESTDIR)$(PREFIX)/share/man/man1/$(DOC)'
+	install -m 644 '$(DOC)' '$(DESTDIR)$(PREFIX)/share/man/man1/$(notdir $(DOC))'
 
 uninstall:
 	rm -f '$(DESTDIR)$(PREFIX)/bin/$(BIN)'
