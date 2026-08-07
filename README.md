@@ -5,9 +5,11 @@ A drop-in cross-platform reimplementation of macOS [`dot_clean`](https://keith.g
 ## Features
 
 - Usage is backwards-compatible to the macOS implementation.
-- **Merges xattrs on HFS+/APFS**, removes on FAT32/exFAT and other FS. This behaviour is not documented in the original but has been derived empirically.
+- **Merges xattrs on macOS HFS+/APFS only**; elsewhere (including Linux), discards and removes sidecars on FAT32/exFAT and other filesystems. Merge behavior is not documented in the original but has been derived empirically.
 - `-N` / `--dry-run` lists deletion targets without changing the filesystem.
-- `-D` / `--deep` and `-S` / `--spotlight` optionally remove Finder / Spotlight junk.
+- `-Q` / `--set-quarantine` applies `com.apple.quarantine` from AppleDouble when merging (off by default, matching Apple).
+- `--keep=mostrecent|dotbar|native` controls which side wins when merging xattrs (default `mostrecent`).
+- `-D` / `--deep` and `-S` / `--spotlight` optionally remove Finder / Spotlight junk (disabled by `-p` / `--preserve`).
 - Opaque whitespace-safe path arguments (I've had problems with how `dot_clean` handles whitespace in the past)
 - GNU-style flags via [pflag](https://github.com/spf13/pflag)
 
@@ -24,7 +26,7 @@ make test          # go test ./...
 make test-e2e      # Darwin only: compare against Apple's dot_clean (skips elsewhere)
 ```
 
-Darwin unit tests (`//go:build darwin`) use `TEST_DIR`, defaulting to system temp directory. Set `TEST_DIR` to an APFS or HFS+ path so that xattr merge tests are not skipped. The same applies to E2E, refer to [e2e/README.md](e2e/README.md).
+Darwin unit tests (`//go:build darwin`) use `TEST_DIR`, defaulting to system temp directory. Set `TEST_DIR` to an APFS or HFS+ path so that xattr merge tests are not skipped. The same applies to end-to-end tests; see [`e2e/README.md`](e2e/README.md).
 
 ## Usage
 

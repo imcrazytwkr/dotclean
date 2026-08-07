@@ -4,7 +4,7 @@
 
 # NAME
 
-dotclean - merge or remove AppleDouble `._*` sidecar files
+`dotclean` - merge or remove AppleDouble **`._*`** sidecar files
 
 # SYNOPSIS
 
@@ -12,65 +12,79 @@ dotclean - merge or remove AppleDouble `._*` sidecar files
 
 # DESCRIPTION
 
-**dotclean** is a cross-platform reimplementation of macOS **dot_clean**(1). For each *directory*, it finds AppleDouble sidecar files (names beginning with `._`) and either merges their metadata into the corresponding native file or discards that metadata, then optionally deletes the sidecar.
+**`dotclean`** is a cross-platform reimplementation of macOS **`dot_clean`**(1). For each *directory*, it finds AppleDouble sidecar files (names beginning with **`._`**) and either merges their metadata into the corresponding native file or discards that metadata, optionally deleting the sidecar file.
 
-**Merge** (apply extended attributes from the AppleDouble file) is performed **only** on **HFS+** and **APFS** volumes. On all other filesystems—including **FAT32** and **exFAT**—metadata cannot be stored natively without recreating a `._*` file, so **dotclean** discards the sidecar contents and deletes the sidecar (unless **--preserve** is set). Missing extended-attribute support is not an error; a successful cleanup exits 0. Merge never applies **com.apple.macl** or **com.apple.provenance**; **com.apple.quarantine** is applied only with **-Q**. Permission errors setting an attribute are skipped so other attributes can still be written.
+**Merge** (applying extended attributes from the AppleDouble file) is performed **only** under macOS and only on **HFS+** and **APFS** volumes. On Linux, HFS+ and APFS support is not consistent enough among various filesystem drivers, so **ext\*** and **Btrfs** extended attributes are not supported. On all other filesystems, including **FAT32** and **exFAT**, metadata cannot be stored natively without recreating a `._*` file, so **`dotclean`** removes the sidecar file unless the **`--preserve`** flag is supplied. Missing extended-attribute support is not an error: a successful clean-up exits 0.
 
-Unlike Apple’s tool, path operands are treated as opaque: whitespace inside a single argument is preserved.
+## CAVEATS
 
-`.DS_Store` and other Finder litter are **not** removed in the default (normal) mode.
+**`dotclean`** never applies **`com.apple.macl`** or **`com.apple.provenance`** attributes as they are considered protected by macOS. The list of protected attributes within the code will get updated as more are discovered. As a precaution, permission errors arising when setting an attribute are skipped.
+
+**`com.apple.quarantine`** attribute is applied only when the **`-Q`** flag is supplied. By default it is ignored to conform to **`dot_clean`**(1).
 
 # OPTIONS
 
-**-f**, **--flat**
+**`-f`**, **`--flat`**
 : Do not recurse into subdirectories.
 
-**-h**, **--help**
+**`-h`**, **`--help`**
 : Print help and exit.
 
-**-m**, **--always-delete**
-: Always delete AppleDouble files (including orphans). Overrides **--preserve**.
+**`-m`**, **`--always-delete`**
+: Always delete AppleDouble files (including orphans). Overrides **`--preserve`**.
 
-**-n**, **--cleanup**
+**`-n`**, **`--cleanup`**
 : Delete an AppleDouble file if there is no matching native file.
 
-**-p**, **--preserve**
-: Preserve AppleDouble files after handling (do not delete paired sidecars).
+**`-p`**, **`--preserve`**
+: Preserve AppleDouble files after handling (do not delete paired sidecars). Disables **`--deep`** and **`--spotlight`**.
 
-**-s**, **--follow-symlinks**
+**`-s`**, **`--follow-symlinks`**
 : Follow symbolic links when they point at AppleDouble files.
 
-**-v**, **--verbose**
+**`-v`**, **`--verbose`**
 : Print verbose progress to standard error.
 
-**-N**, **--dry-run**
+**`-N`**, **`--dry-run`**
 : List paths that would be deleted; do not merge or delete anything.
 
-**-Q**, **--set-quarantine**
-: When merging on HFS+/APFS, apply **com.apple.quarantine** from the AppleDouble sidecar. Off by default (matches Apple **dot_clean**, which does not re-apply quarantine).
+**`-Q`**, **`--set-quarantine`**
+: When merging on HFS+/APFS, apply **com.apple.quarantine** from the AppleDouble sidecar. Off by default (matches **`dot_clean`**(1), which does not re-apply quarantine).
 
-**--keep**=*mode*
-: When merging on HFS+/APFS: **mostrecent** (default; prefer existing native attributes), **dotbar** (prefer AppleDouble), or **native** (skip applying AppleDouble attributes).
+**`-D`**, **`--deep`**
+: Remove **`.DS_Store`**, **`.AppleDouble`**, **`.Trashes`**, and **`.TemporaryItems`** (files or directories). Off by default. Ignored when **`-p`** / **`--preserve`** is set.
+
+**`-S`**, **`--spotlight`**
+: Remove **`.fseventsd`** and directories whose names start with **`.Spotlight`**. Off by default. Ignored when **`-p`** / **`--preserve`** is set.
+
+**`--keep`**=*`mode`*
+: When merging on HFS+/APFS: **mostrecent** (default, prefer existing native attributes), **dotbar** (prefer AppleDouble), or **native** (skip applying AppleDouble attributes).
 
 # DELETE RULES
 
-| Situation | Default | **-m** | **-p** | **-n** |
-|-----------|---------|--------|--------|--------|
-| Paired sidecar (native exists), after handle | Delete | Delete | Keep | — |
-| Orphan sidecar (no native) | Keep | Delete | Keep | Delete |
+| **Native file** | Default | **-m** | **-p** | **-n** |
+|-----------------|---------|--------|--------|--------|
+| Exists          | Delete  | Delete | Keep   | N/A    |
+| Does not exist  | Keep    | Delete | Keep   | Delete |
 
 # EXAMPLES
 
-Remove AppleDouble sidecars under a USB volume (typical FAT/exFAT cleanup):
+Remove AppleDouble sidecars on a USB volume under macOS (typical FAT/exFAT clean-up):
 
 ```
 dotclean /Volumes/USB
 ```
 
+Remove AppleDouble sidecars on a USB volume under Linux (GVFS):
+
+```
+dotclean /run/media/user/USB
+```
+
 Preview deletions:
 
 ```
-dotclean -N "/media/user/My Drive/Pictures"
+dotclean -N '/run/media/user/My Drive/Pictures'
 ```
 
 Merge preferring AppleDouble data on an APFS path, then delete sidecars:
@@ -79,9 +93,16 @@ Merge preferring AppleDouble data on an APFS path, then delete sidecars:
 dotclean --keep=dotbar ~/Documents
 ```
 
-# DIAGNOSTICS
+# EXIT STATUS
 
-**dotclean** exits 0 on success (including a successful dry-run), and \>0 if an error occurs.
+**0**
+: Success, including a successful dry-run or help.
+
+**1**
+: No directories were given, or an error occurred while cleaning.
+
+**2**
+: Invalid options (bad flags or an unrecognized **`--keep`** value).
 
 # SEE ALSO
 
@@ -89,4 +110,4 @@ dotclean --keep=dotbar ~/Documents
 
 # NOTES
 
-This implementation is not affiliated with Apple. Behavior aims to match useful **dot_clean** semantics for removable media while fixing path whitespace handling and documenting **--preserve** (**-p**), which appears in Apple’s **-h** output but not always in the published man page.
+This implementation is not affiliated with Apple. Behavior aims to match **`dot_clean`**(1) as much as possible while also providing Linux and BSD support and additional options for deeper cleaning of macOS resource files.
