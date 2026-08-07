@@ -143,6 +143,56 @@ func TestParseOptsSetQuarantine(t *testing.T) {
 	}
 }
 
+func TestParseOptsDeepSpotlight(t *testing.T) {
+	opts, code := cli.ParseOpts([]string{"dotclean", "-D", "-S", "/tmp"})
+	if code != cli.ExitContinue {
+		t.Fatalf("want ExitContinue, got %d", code)
+	}
+	if !opts.Deep || !opts.Spotlight {
+		t.Fatalf("deep/spotlight: %+v", opts)
+	}
+	opts, code = cli.ParseOpts([]string{"dotclean", "--deep", "--spotlight", "/tmp"})
+	if code != cli.ExitContinue {
+		t.Fatalf("want ExitContinue, got %d", code)
+	}
+	if !opts.Deep || !opts.Spotlight {
+		t.Fatal("long flags")
+	}
+	opts, code = cli.ParseOpts([]string{"dotclean", "/tmp"})
+	if code != cli.ExitContinue {
+		t.Fatalf("want ExitContinue, got %d", code)
+	}
+	if opts.Deep || opts.Spotlight {
+		t.Fatal("deep/spotlight should default off")
+	}
+}
+
+func TestParseOptsPreserveDisablesDeep(t *testing.T) {
+	opts, code := cli.ParseOpts([]string{"dotclean", "-D", "-p", "/tmp"})
+	if code != cli.ExitContinue {
+		t.Fatalf("want ExitContinue, got %d", code)
+	}
+	if opts.Deep {
+		t.Fatal("-p should clear Deep")
+	}
+	if !opts.Preserve {
+		t.Fatal("preserve should remain set")
+	}
+}
+
+func TestParseOptsPreserveDisablesSpotlight(t *testing.T) {
+	opts, code := cli.ParseOpts([]string{"dotclean", "-S", "-p", "/tmp"})
+	if code != cli.ExitContinue {
+		t.Fatalf("want ExitContinue, got %d", code)
+	}
+	if opts.Spotlight {
+		t.Fatal("-p should clear Spotlight")
+	}
+	if !opts.Preserve {
+		t.Fatal("preserve should remain set")
+	}
+}
+
 func TestParseOptsSpacedDir(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "dir a")
 	if err := os.Mkdir(dir, 0o755); err != nil {

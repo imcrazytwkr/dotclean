@@ -32,6 +32,8 @@ func ParseOpts(args []string) (*Options, int) {
 	fs.BoolVarP(&opts.Verbose, "verbose", "v", false, "verbose output")
 	fs.BoolVarP(&opts.DryRun, "dry-run", "N", false, "list deletion targets only; do not merge or delete")
 	fs.BoolVarP(&opts.SetQuarantine, "set-quarantine", "Q", false, "apply com.apple.quarantine from AppleDouble when merging")
+	fs.BoolVarP(&opts.Deep, "deep", "D", false, "also remove .DS_Store, .AppleDouble, .Trashes, .TemporaryItems")
+	fs.BoolVarP(&opts.Spotlight, "spotlight", "S", false, "also remove .fseventsd and .Spotlight* directories")
 
 	var help bool
 	fs.BoolVarP(&help, "help", "h", false, "print help and exit")
@@ -80,6 +82,12 @@ func ParseOpts(args []string) (*Options, int) {
 	// -m overrides -p
 	if opts.AlwaysDelete {
 		opts.Preserve = false
+	}
+
+	// -p disables deep and spotlight junk removal
+	if opts.Preserve {
+		opts.Deep = false
+		opts.Spotlight = false
 	}
 
 	return opts, ExitContinue

@@ -18,11 +18,13 @@ Options:
   -h, --help              Print this help and exit
   -m, --always-delete     Always delete AppleDouble files
   -n, --cleanup           Delete AppleDouble if there is no matching native file
-  -p, --preserve          Preserve AppleDouble file after handling
+  -p, --preserve          Preserve AppleDouble file after handling (disables --deep/--spotlight)
   -s, --follow-symlinks   Follow symbolic links to AppleDouble files
   -v, --verbose           Verbose output
   -N, --dry-run           List deletion targets only; do not merge or delete
   -Q, --set-quarantine    Apply com.apple.quarantine from AppleDouble when merging
+  -D, --deep              Also remove .DS_Store, .AppleDouble, .Trashes, .TemporaryItems (off with -p)
+  -S, --spotlight         Also remove .fseventsd and .Spotlight* directories (off with -p)
       --keep=MODE         mostrecent (default), dotbar, or native
 
 See docs/dotclean.1.md or 'man dotclean' for the full manual.

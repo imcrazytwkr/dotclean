@@ -63,7 +63,7 @@ func Execute(actions []Action, opts *cli.Options, mergeFn func(sidecar, native s
 				fmt.Fprintf(os.Stderr, "delete %s\n", a.Path)
 			}
 
-			err := os.Remove(a.Path)
+			err := os.RemoveAll(a.Path)
 			if err != nil && !os.IsNotExist(err) {
 				fmt.Fprintf(os.Stderr, "delete %s: %v\n", a.Path, err)
 				failed++

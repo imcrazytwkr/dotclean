@@ -7,6 +7,7 @@ A drop-in cross-platform reimplementation of macOS [`dot_clean`](https://keith.g
 - Usage is backwards-compatible to the macOS implementation.
 - **Merges xattrs on HFS+/APFS**, removes on FAT32/exFAT and other FS. This behaviour is not documented in the original but has been derived empirically.
 - `-N` / `--dry-run` lists deletion targets without changing the filesystem.
+- `-D` / `--deep` and `-S` / `--spotlight` optionally remove Finder / Spotlight junk.
 - Opaque whitespace-safe path arguments (I've had problems with how `dot_clean` handles whitespace in the past)
 - GNU-style flags via [pflag](https://github.com/spf13/pflag)
 

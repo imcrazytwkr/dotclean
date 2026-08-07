@@ -28,8 +28,9 @@ func resolveSymlink(c classify.Candidate, opts *cli.Options) (classify.Candidate
 	}
 	c.Path = target
 	dir, name := filepath.Split(target)
-	if n, ok := classify.ClassifyName(filepath.Clean(dir), name); ok {
+	if n, ok := classify.ClassifyName(filepath.Clean(dir), name, opts.DeepEnabled(), opts.SpotlightEnabled()); ok {
 		c.Native = n.Native
+		c.Kind = n.Kind
 	}
 	return c, true
 }

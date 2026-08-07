@@ -1,10 +1,10 @@
 package classify
 
-// TargetKind identifies junk/sidecar classes. Extra kinds reserved for future deep/spotlight.
+// TargetKind identifies junk/sidecar classes.
 type TargetKind int
 
 const (
-	KindAppleDouble   TargetKind = iota
-	KindDeepJunk                 // future
-	KindSpotlightJunk            // future
+	KindAppleDouble TargetKind = iota
+	KindDeepJunk
+	KindSpotlightJunk
 )

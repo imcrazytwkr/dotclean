@@ -33,7 +33,22 @@ func Run(options *cli.Options) error {
 func plan(cands []classify.Candidate, opts *cli.Options, fsCache *fstype.Cache) []action.Action {
 	var out []action.Action
 	for _, c := range cands {
-		if c.Kind != classify.KindAppleDouble {
+		switch c.Kind {
+		case classify.KindDeepJunk:
+			if opts.Preserve {
+				continue
+			}
+			out = append(out, action.Action{Kind: action.Delete, Path: c.Path})
+			continue
+		case classify.KindSpotlightJunk:
+			if opts.Preserve {
+				continue
+			}
+			out = append(out, action.Action{Kind: action.Delete, Path: c.Path})
+			continue
+		case classify.KindAppleDouble:
+			// handled below
+		default:
 			continue
 		}
 

@@ -11,7 +11,7 @@ import (
 	"github.com/imcrazytwkr/dotclean/internal/collections"
 )
 
-// Collect walks roots and returns AppleDouble candidates.
+// Collect walks roots and returns classified candidates.
 func Collect(opts *cli.Options) ([]classify.Candidate, error) {
 	var out []classify.Candidate
 	var seen collections.Set[string]
@@ -54,7 +54,6 @@ func walkOne(root string, opts *cli.Options, emit func(classify.Candidate)) erro
 				fmt.Fprintf(os.Stderr, "warning: %v\n", err)
 			}
 
-			// Skip unreadable dirs; continue walk.
 			if d != nil && d.IsDir() {
 				return filepath.SkipDir
 			}
@@ -62,14 +61,20 @@ func walkOne(root string, opts *cli.Options, emit func(classify.Candidate)) erro
 			return nil
 		}
 
-		if d.IsDir() {
+		// Never treat the walk root as a junk target.
+		if path == root {
 			return nil
 		}
 
 		name := d.Name()
-		c, ok := classify.ClassifyName(filepath.Dir(path), name)
+		c, ok := classify.ClassifyName(filepath.Dir(path), name, opts.DeepEnabled(), opts.SpotlightEnabled())
 		if !ok {
 			return nil
+		}
+
+		if d.IsDir() {
+			emit(c)
+			return filepath.SkipDir
 		}
 
 		c, ok = resolveSymlink(c, opts)
@@ -89,12 +94,13 @@ func walkFlat(root string, opts *cli.Options, emit func(classify.Candidate)) err
 	}
 
 	for _, e := range entries {
-		if e.IsDir() {
+		c, ok := classify.ClassifyName(root, e.Name(), opts.DeepEnabled(), opts.SpotlightEnabled())
+		if !ok {
 			continue
 		}
 
-		c, ok := classify.ClassifyName(root, e.Name())
-		if !ok {
+		if e.IsDir() {
+			emit(c)
 			continue
 		}
 

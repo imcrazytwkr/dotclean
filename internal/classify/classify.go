@@ -13,21 +13,34 @@ type Candidate struct {
 }
 
 // ClassifyName classifies a single file/dir base name within dir.
-// Returns ok=false if the name is not a target under current (normal) mode.
-func ClassifyName(dir, name string) (Candidate, bool) {
-	if !strings.HasPrefix(name, "._") {
-		return Candidate{}, false
+// deep/spotlight enable extra junk kinds; AppleDouble is always considered.
+func ClassifyName(dir, name string, deep, spotlight bool) (Candidate, bool) {
+	path := filepath.Join(dir, name)
+
+	if strings.HasPrefix(name, "._") {
+		nativeBase := name[2:]
+		if len(nativeBase) == 0 {
+			return Candidate{}, false
+		}
+		return Candidate{
+			Kind:   KindAppleDouble,
+			Path:   path,
+			Native: filepath.Join(dir, nativeBase),
+		}, true
 	}
 
-	nativeBase := name[2:]
-	if len(nativeBase) == 0 {
-		return Candidate{}, false
+	if deep {
+		switch name {
+		case ".DS_Store", ".AppleDouble", ".Trashes", ".TemporaryItems":
+			return Candidate{Kind: KindDeepJunk, Path: path}, true
+		}
 	}
 
-	native := filepath.Join(dir, nativeBase)
-	return Candidate{
-		Kind:   KindAppleDouble,
-		Path:   filepath.Join(dir, name),
-		Native: native,
-	}, true
+	if spotlight {
+		if name == ".fseventsd" || strings.HasPrefix(name, ".Spotlight") {
+			return Candidate{Kind: KindSpotlightJunk, Path: path}, true
+		}
+	}
+
+	return Candidate{}, false
 }

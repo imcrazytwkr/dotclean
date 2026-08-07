@@ -162,3 +162,140 @@ func TestAlwaysDeleteOverridesPreserve(t *testing.T) {
 		t.Fatal("native should remain")
 	}
 }
+
+func TestDeepRemovesJunkLeavesAppleDoubleRules(t *testing.T) {
+	dir := t.TempDir()
+	ds := filepath.Join(dir, ".DS_Store")
+	trashes := filepath.Join(dir, ".Trashes")
+	native := filepath.Join(dir, "photo.jpg")
+	sidecar := filepath.Join(dir, "._photo.jpg")
+	if err := os.WriteFile(ds, []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(trashes, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(trashes, "inner"), []byte("y"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(native, []byte("n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(sidecar, []byte("s"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	opts := &cli.Options{Dirs: []string{dir}, Deep: true, Keep: cli.KeepNative}
+	if err := clean.Run(opts); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(ds); !os.IsNotExist(err) {
+		t.Fatal(".DS_Store should be removed with -D")
+	}
+	if _, err := os.Stat(trashes); !os.IsNotExist(err) {
+		t.Fatal(".Trashes should be removed with -D")
+	}
+	if _, err := os.Stat(sidecar); !os.IsNotExist(err) {
+		t.Fatal("paired sidecar should still be deleted by default")
+	}
+	if _, err := os.Stat(native); err != nil {
+		t.Fatal("native should remain")
+	}
+}
+
+func TestWithoutDeepJunkRemains(t *testing.T) {
+	dir := t.TempDir()
+	ds := filepath.Join(dir, ".DS_Store")
+	if err := os.WriteFile(ds, []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	opts := &cli.Options{Dirs: []string{dir}, Keep: cli.KeepNative}
+	if err := clean.Run(opts); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(ds); err != nil {
+		t.Fatal(".DS_Store should remain without -D")
+	}
+}
+
+func TestPreserveDisablesDeep(t *testing.T) {
+	dir := t.TempDir()
+	ds := filepath.Join(dir, ".DS_Store")
+	native := filepath.Join(dir, "photo.jpg")
+	sidecar := filepath.Join(dir, "._photo.jpg")
+	if err := os.WriteFile(ds, []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(native, []byte("n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(sidecar, []byte("s"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	opts := &cli.Options{Dirs: []string{dir}, Deep: true, Preserve: true, Keep: cli.KeepNative}
+	if err := clean.Run(opts); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(ds); err != nil {
+		t.Fatal(".DS_Store should remain when -p disables deep")
+	}
+	if _, err := os.Stat(sidecar); err != nil {
+		t.Fatal("sidecar should be preserved with -p")
+	}
+}
+
+func TestPreserveDisablesSpotlight(t *testing.T) {
+	dir := t.TempDir()
+	spot := filepath.Join(dir, ".Spotlight-V100")
+	if err := os.Mkdir(spot, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	opts := &cli.Options{Dirs: []string{dir}, Spotlight: true, Preserve: true, Keep: cli.KeepNative}
+	if err := clean.Run(opts); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(spot); err != nil {
+		t.Fatal(".Spotlight-V100 should remain when -p disables spotlight")
+	}
+}
+
+func TestSpotlightRemovesSpotlightDir(t *testing.T) {
+	dir := t.TempDir()
+	spot := filepath.Join(dir, ".Spotlight-V100")
+	if err := os.Mkdir(spot, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	opts := &cli.Options{Dirs: []string{dir}, Spotlight: true, Keep: cli.KeepNative}
+	if err := clean.Run(opts); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(spot); !os.IsNotExist(err) {
+		t.Fatal(".Spotlight-V100 should be removed with -S")
+	}
+}
+
+func TestDeepDryRunListsJunk(t *testing.T) {
+	dir := t.TempDir()
+	ds := filepath.Join(dir, ".DS_Store")
+	if err := os.WriteFile(ds, []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	r, w, _ := os.Pipe()
+	old := os.Stdout
+	os.Stdout = w
+	opts := &cli.Options{Dirs: []string{dir}, Deep: true, DryRun: true, Keep: cli.KeepNative}
+	err := clean.Run(opts)
+	w.Close()
+	os.Stdout = old
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, _ := io.ReadAll(r)
+	if !bytes.Contains(out, []byte(ds)) {
+		t.Fatalf("dry-run missing .DS_Store: %s", out)
+	}
+	if _, err := os.Stat(ds); err != nil {
+		t.Fatal(".DS_Store should remain after dry-run")
+	}
+}
