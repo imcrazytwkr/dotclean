@@ -83,9 +83,13 @@ func TestApplySkipsMaclAndProvenance(t *testing.T) {
 	}
 
 	names := listXattrNames(t, native)
-	if names["com.apple.macl"] || names["com.apple.provenance"] {
-		t.Fatalf("SIP-ish attrs should be skipped; have %v", names)
+
+	// macl is never written from AppleDouble. provenance is also skipped in
+	// merge, but macOS may attach its own provenance when other xattrs are set.
+	if names["com.apple.macl"] {
+		t.Fatalf("macl should be skipped; have %v", names)
 	}
+
 	if !names["com.apple.lastuseddate#PS"] {
 		t.Fatalf("expected lastuseddate from sidecar; have %v", names)
 	}

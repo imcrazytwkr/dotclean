@@ -103,8 +103,16 @@ func TestCollectFollowSymlink(t *testing.T) {
 	if cands[0].Path != resolved {
 		t.Fatalf("FollowSymlinks path=%q want %q", cands[0].Path, resolved)
 	}
-	if cands[0].Native != filepath.Join(realDir, "photo.jpg") {
-		t.Fatalf("native=%q", cands[0].Native)
+
+	// realDir may sit under a symlinked prefix (e.g. /tmp -> /private/tmp on macOS).
+	realResolved, err := filepath.EvalSymlinks(realDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	wantNative := filepath.Join(realResolved, "photo.jpg")
+	if cands[0].Native != wantNative {
+		t.Fatalf("native=%q want %q", cands[0].Native, wantNative)
 	}
 }
 
