@@ -48,7 +48,7 @@ func TestDeletePairedDefault(t *testing.T) {
 	os.WriteFile(native, []byte("x"), 0o644)
 	os.WriteFile(sidecar, []byte("y"), 0o644)
 
-	opts := &cli.Options{Dirs: []string{dir}, Keep: cli.KeepMostRecent}
+	opts := &cli.Options{Dirs: []string{dir}, Keep: cli.KeepNative}
 	if err := clean.Run(opts); err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +67,7 @@ func TestPreserveKeepsSidecar(t *testing.T) {
 	os.WriteFile(native, []byte("x"), 0o644)
 	os.WriteFile(sidecar, []byte("y"), 0o644)
 
-	opts := &cli.Options{Dirs: []string{dir}, Preserve: true, Keep: cli.KeepMostRecent}
+	opts := &cli.Options{Dirs: []string{dir}, Preserve: true, Keep: cli.KeepNative}
 	if err := clean.Run(opts); err != nil {
 		t.Fatal(err)
 	}
@@ -107,7 +107,7 @@ func TestFlatDoesNotRecurse(t *testing.T) {
 	os.WriteFile(filepath.Join(sub, "nested.jpg"), []byte("c"), 0o644)
 	os.WriteFile(filepath.Join(sub, "._nested.jpg"), []byte("d"), 0o644)
 
-	opts := &cli.Options{Dirs: []string{dir}, Flat: true, Keep: cli.KeepMostRecent}
+	opts := &cli.Options{Dirs: []string{dir}, Flat: true, Keep: cli.KeepNative}
 	if err := clean.Run(opts); err != nil {
 		t.Fatal(err)
 	}
