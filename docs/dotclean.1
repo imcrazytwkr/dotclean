@@ -23,6 +23,11 @@ sidecar contents and deletes the sidecar (unless \f[B]\[en]preserve\f[R]
 is set).
 Missing extended\-attribute support is not an error; a successful
 cleanup exits 0.
+Merge never applies \f[B]com.apple.macl\f[R] or
+\f[B]com.apple.provenance\f[R]; \f[B]com.apple.quarantine\f[R] is
+applied only with \f[B]\-Q\f[R].
+Permission errors setting an attribute are skipped so other attributes
+can still be written.
 .PP
 Unlike Apple\[cq]s tool, path operands are treated as opaque: whitespace
 inside a single argument is preserved.

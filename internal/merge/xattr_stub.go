@@ -11,3 +11,7 @@ func listXattr(path string) (collections.Set[string], error) {
 func setXattr(path, name string, val []byte) error {
 	return nil
 }
+
+func isIgnoredXattrError(err error) bool {
+	return false
+}

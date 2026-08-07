@@ -18,7 +18,7 @@ Skipped (exit 0) when not on Darwin or when a suitable `dot_clean` is not on `PA
 
 - sidecar presence
 - exit status
-- native xattr names/values after `--keep=dotbar` (case 07)
+- native xattr names/values after `--keep=dotbar` (case 07), excluding attrs that may still differ under SIP (`com.apple.macl`, `com.apple.provenance` — product merge also skips these; regex is a safety net). Default merge omits quarantine on both tools (Apple never applies it; ours requires `-Q`).
 
 **Ours-only:**
 
@@ -26,5 +26,6 @@ Skipped (exit 0) when not on Darwin or when a suitable `dot_clean` is not on `PA
   - exits with 0
   - lists the sidecar
   - leaves the tree unchanged
+- `-Q` / `--set-quarantine` (opt-in quarantine from AppleDouble; not used in parity cases)
 
 **Not compared:** path whitespace handling (intentional difference); unimplemented Apple modes.

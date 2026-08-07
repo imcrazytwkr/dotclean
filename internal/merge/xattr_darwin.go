@@ -3,6 +3,8 @@
 package merge
 
 import (
+	"errors"
+
 	"github.com/imcrazytwkr/dotclean/internal/collections"
 	"golang.org/x/sys/unix"
 )
@@ -39,4 +41,8 @@ func listXattr(path string) (collections.Set[string], error) {
 
 func setXattr(path, name string, val []byte) error {
 	return unix.Lsetxattr(path, name, val, 0)
+}
+
+func isIgnoredXattrError(err error) bool {
+	return errors.Is(err, unix.EPERM) || errors.Is(err, unix.EACCES)
 }

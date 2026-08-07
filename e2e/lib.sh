@@ -18,6 +18,7 @@ export GOLDEN_PDF
 # Xattrs that may differ or fail under SIP / policy; ignored in comparisons.
 XATTR_SKIP_REGEX='^(com\.apple\.macl|com\.apple\.provenance)$'
 
+
 case_setup() {
 	local name="$1"
 	CASE_DIR="${E2E_WORK}/${name}"

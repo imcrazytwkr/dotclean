@@ -74,6 +74,23 @@ func TestApplyMostRecentKeepsExisting(t *testing.T) {
 	}
 }
 
+func TestApplySkipsMaclAndProvenance(t *testing.T) {
+	dir := requireMergeDir(t)
+	native, sidecar := stageGolden(t, dir, "doc.epub", "rich.epub.appledouble")
+
+	if err := merge.Apply(sidecar, native, &cli.Options{Keep: cli.KeepDotbar}); err != nil {
+		t.Fatal(err)
+	}
+
+	names := listXattrNames(t, native)
+	if names["com.apple.macl"] || names["com.apple.provenance"] {
+		t.Fatalf("SIP-ish attrs should be skipped; have %v", names)
+	}
+	if !names["com.apple.lastuseddate#PS"] {
+		t.Fatalf("expected lastuseddate from sidecar; have %v", names)
+	}
+}
+
 func requireMergeDir(t *testing.T) string {
 	t.Helper()
 	dir := testenv.TempDir(t, "dotclean-merge-*")

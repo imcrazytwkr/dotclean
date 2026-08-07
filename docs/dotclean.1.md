@@ -14,7 +14,7 @@ dotclean - merge or remove AppleDouble `._*` sidecar files
 
 **dotclean** is a cross-platform reimplementation of macOS **dot_clean**(1). For each *directory*, it finds AppleDouble sidecar files (names beginning with `._`) and either merges their metadata into the corresponding native file or discards that metadata, then optionally deletes the sidecar.
 
-**Merge** (apply extended attributes from the AppleDouble file) is performed **only** on **HFS+** and **APFS** volumes. On all other filesystems—including **FAT32** and **exFAT**—metadata cannot be stored natively without recreating a `._*` file, so **dotclean** discards the sidecar contents and deletes the sidecar (unless **--preserve** is set). Missing extended-attribute support is not an error; a successful cleanup exits 0.
+**Merge** (apply extended attributes from the AppleDouble file) is performed **only** on **HFS+** and **APFS** volumes. On all other filesystems—including **FAT32** and **exFAT**—metadata cannot be stored natively without recreating a `._*` file, so **dotclean** discards the sidecar contents and deletes the sidecar (unless **--preserve** is set). Missing extended-attribute support is not an error; a successful cleanup exits 0. Merge never applies **com.apple.macl** or **com.apple.provenance**; **com.apple.quarantine** is applied only with **-Q**. Permission errors setting an attribute are skipped so other attributes can still be written.
 
 Unlike Apple’s tool, path operands are treated as opaque: whitespace inside a single argument is preserved.
 
