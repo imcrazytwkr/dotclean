@@ -1,11 +1,15 @@
-.PHONY: clean build format test man install uninstall
+.PHONY: clean build format test test-logged man install uninstall
 
 PREFIX ?= /usr
 BIN := dotclean
 DOC := $(BIN).1
 
+clean:
+	rm -f '$(BIN)'
+	go clean -testcache
+
 build:
-	go build -o $(BIN) .
+	go build -o '$(BIN)' .
 
 format:
 	go fmt ./...
@@ -13,6 +17,9 @@ format:
 
 test: format
 	go test ./... | sed '/^[[:space:]]*?/d'
+
+test-logged: format
+	go test ./... -v 2>&1 | tee test.log
 
 man: docs/dotclean.1.md
 	@command -v pandoc >/dev/null || { echo "pandoc required for make man"; exit 1; }
@@ -28,6 +35,3 @@ install: build
 uninstall:
 	rm -f '$(DESTDIR)$(PREFIX)/bin/$(BIN)'
 	rm -f '$(DESTDIR)$(PREFIX)/share/man/man1/$(DOC)'
-
-clean:
-	rm -f $(BIN)
