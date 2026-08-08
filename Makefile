@@ -1,5 +1,3 @@
-.PHONY: clean build format test test-logged test-e2e test-e2e-logged man install uninstall
-
 PREFIX ?= /usr
 
 BIN := dotclean
@@ -17,22 +15,6 @@ build: $(BIN)
 $(BIN): $(GO_SRC) go.mod go.sum
 	go build -o '$(BIN)' .
 
-format:
-	go fmt ./...
-	go mod tidy
-
-test: format
-	go test ./... | sed '/^[[:space:]]*?/d'
-
-test-logged: format
-	go test ./... -v 2>&1 | tee test.log
-
-test-e2e:
-	./e2e/run.sh
-
-test-e2e-logged:
-	./e2e/run.sh 2>&1 | tee test-e2e.log
-
 man: $(DOC)
 
 $(DOC): $(MAN_MD)
@@ -49,3 +31,5 @@ install: $(BIN) $(DOC)
 uninstall:
 	rm -f '$(DESTDIR)$(PREFIX)/bin/$(BIN)'
 	rm -f '$(DESTDIR)$(PREFIX)/share/man/man1/$(DOC)'
+
+.PHONY: clean build man install uninstall
