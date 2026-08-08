@@ -1,6 +1,7 @@
 /dotclean
 *.exe
 *.test
-/dist/
+dist/
 *.log
 docs/*.1
+vendor/
